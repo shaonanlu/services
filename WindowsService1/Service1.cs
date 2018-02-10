@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
@@ -13,6 +14,8 @@ namespace WindowsService1
         StringBuilder sb;
         DirectoryInfo dirInfo;
         FileSystemWatcher _watch = new FileSystemWatcher();
+        SqlConnection conn = new SqlConnection("Data Source=.\\sqlexpress;Initial Catalog=txtdatabase;User Id=admin;Password=admin;");
+        SqlCommand cmd = new SqlCommand();
         public Service1()
         {
             InitializeComponent();
@@ -41,7 +44,17 @@ namespace WindowsService1
             _watch.Created += new FileSystemEventHandler(_watch_Created);
             _watch.Changed += new FileSystemEventHandler(_watch_Changed);
             _watch.Renamed += new RenamedEventHandler(_watch_Renamed);
-            _watch.Deleted += new FileSystemEventHandler(_watch_Deleted);            
+            _watch.Deleted += new FileSystemEventHandler(_watch_Deleted);
+
+            try
+            {
+                conn.Open();
+                cmd.Connection = conn;
+            }
+            catch (Exception ex)
+            {
+                eventLog1.WriteEntry(ex.Message);
+            }
         }
 
         private void _watch_Deleted(object sender, FileSystemEventArgs e)
@@ -77,19 +90,35 @@ namespace WindowsService1
 
         private void _watch_Created(object sender, FileSystemEventArgs e)
         {
+            string a, b;
             sb = new StringBuilder();
             dirInfo = new DirectoryInfo(e.FullPath.ToString());
-            sb.AppendLine("新建檔案於：" + dirInfo.FullName.Replace(dirInfo.Name, ""));
-            sb.AppendLine("新建檔案名稱：" + dirInfo.Name);
+            //sb.AppendLine("新建檔案於：" + dirInfo.FullName.Replace(dirInfo.Name, ""));
+            a = dirInfo.FullName.Replace(dirInfo.Name, "");
+            //sb.AppendLine("新建檔案名稱：" + dirInfo.Name);
+            b = dirInfo.Name;
             sb.AppendLine("建立時間：" + dirInfo.CreationTime.ToString());
             sb.AppendLine("目錄下共有：" + dirInfo.Parent.GetFiles().Count() + " 檔案");
-            sb.AppendLine("目錄下共有：" + dirInfo.Parent.GetDirectories().Count() + " 資料夾");
+            sb.AppendLine("目錄下共有：" + dirInfo.Parent.GetDirectories().Count() + " 資料夾(連線有成功)");
             eventLog1.WriteEntry(sb.ToString());
+
+            int i;
+            try
+            {
+                cmd.CommandText = @"INSERT INTO txtFileCreated (path,filename) VALUES ('" + a + "','" + b + "')";
+                i = cmd.ExecuteNonQuery();                
+            }
+            catch (Exception ex)
+            {
+                eventLog1.WriteEntry(ex.Message);
+            }
+            
         }
 
         protected override void OnStop()
         {
             eventLog1.WriteEntry("Stop.");
+            conn.Close();
         }
     }
 }
