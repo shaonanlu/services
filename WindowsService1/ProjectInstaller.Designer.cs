@@ -39,9 +39,9 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.Description = "My Services ";
-            this.serviceInstaller1.DisplayName = "My Services";
-            this.serviceInstaller1.ServiceName = "Service1";
+            this.serviceInstaller1.Description = "My Services";
+            this.serviceInstaller1.DisplayName = "監視檔案系統";
+            this.serviceInstaller1.ServiceName = "txtWatcher";
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller
