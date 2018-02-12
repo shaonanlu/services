@@ -14,7 +14,7 @@ namespace WindowsService1
         StringBuilder sb;
         DirectoryInfo dirInfo;
         FileSystemWatcher _watch = new FileSystemWatcher();
-        SqlConnection conn = new SqlConnection("Data Source=.\\sqlexpress;Initial Catalog=txtdatabase;User Id=admin;Password=admin;");
+        SqlConnection conn = new SqlConnection("Server=localhost\\SQLEXPRESS;Database=master;Trusted_Connection=True;");
         SqlCommand cmd = new SqlCommand();
         public Service1()
         {
