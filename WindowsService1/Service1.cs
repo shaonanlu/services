@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Text;
-using System.Timers;
 
 namespace WindowsService1
 {
@@ -14,7 +13,7 @@ namespace WindowsService1
         StringBuilder sb;
         DirectoryInfo dirInfo;
         FileSystemWatcher _watch = new FileSystemWatcher();
-        SqlConnection conn = new SqlConnection("Server=localhost\\SQLEXPRESS;Database=master;Trusted_Connection=True;");
+        SqlConnection conn = new SqlConnection("Server=.\\SQLEXPRESS;Database=master;uid=admin;password=admin;");
         SqlCommand cmd = new SqlCommand();
         public Service1()
         {
@@ -105,8 +104,9 @@ namespace WindowsService1
             int i;
             try
             {
-                cmd.CommandText = @"INSERT INTO txtFileCreated (path,filename) VALUES ('" + a + "','" + b + "')";
-                i = cmd.ExecuteNonQuery();                
+                cmd.CommandText = @"USE txtdatabase ;INSERT INTO txtFileCreated (path,filename) VALUES ('" + a + "','" + b + "')";
+                i = cmd.ExecuteNonQuery();
+                eventLog1.WriteEntry(i.ToString());
             }
             catch (Exception ex)
             {
